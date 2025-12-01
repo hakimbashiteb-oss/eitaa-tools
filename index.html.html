@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جعبه ابزار محاسباتی هوشمند</title>
+    <!-- فونت وزیر برای نمایش زیبای فارسی -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
+    <!-- آیکون‌ها -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-light: #6b7280;
+            --border-radius: 16px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        body {
+            font-family: 'Vazir', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        header p {
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        /* Tabs Navigation */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            background: #e0e7ff;
+            padding: 5px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-family: 'Vazir', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 120px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: var(--primary);
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Content Sections */
+        .content {
+            padding: 30px;
+            min-height: 400px;
+        }
+
+        .tool-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tool-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-family: 'Vazir', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        button.action-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-family: 'Vazir', sans-serif;
+            font-weight: bold;
+        }
+
+        button.action-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Results */
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result-box h3 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-main);
+            margin: 10px 0;
+        }
+
+        .result-detail {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Responsive Helpers */
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+        .col {
+            flex: 1;
+        }
+        @media (max-width: 600px) {
+            .row { flex-direction: column; gap: 10px; }
+            .tabs { overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; }
+            .tab-btn { flex: 0 0 auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1><i class="fas fa-calculator"></i> جعبه ابزار هوشمند</h1>
+        <p>مجموعه ابزارهای دقیق محاسباتی در یک مکان</p>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('bmi')"><i class="fas fa-weight"></i> BMI</button>
+        <button class="tab-btn" onclick="openTab('age')"><i class="fas fa-birthday-cake"></i> سن دقیق</button>
+        <button class="tab-btn" onclick="openTab('date')"><i class="fas fa-calendar-alt"></i> تبدیل تاریخ</button>
+        <button class="tab-btn" onclick="openTab('unit')"><i class="fas fa-ruler-combined"></i> تبدیل واحد</button>
+        <button class="tab-btn" onclick="openTab('baby')"><i class="fas fa-baby"></i> سن جنین</button>
+        <button class="tab-btn" onclick="openTab('loan')"><i class="fas fa-money-bill-wave"></i> محاسبه وام</button>
+    </div>
+
+    <div class="content">
+        
+        <!-- 1. BMI Calculator -->
+        <div id="bmi" class="tool-section active">
+            <h2>محاسبه شاخص توده بدنی (BMI)</h2>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>وزن (کیلوگرم)</label>
+                        <input type="number" id="bmi-weight" placeholder="مثلا 75">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>قد (سانتی‌متر)</label>
+                        <input type="number" id="bmi-height" placeholder="مثلا 175">
+                    </div>
+                </div>
+            </div>
+            <button class="action-btn" onclick="calculateBMI()">محاسبه</button>
+            <div id="bmi-result" class="result-box"></div>
+        </div>
+
+        <!-- 2. Exact Age Calculator -->
+        <div id="age" class="tool-section">
+            <h2>محاسبه دقیق سن (شمسی)</h2>
+            <p style="font-size: 0.9rem; color: #666;">تاریخ تولد خود را وارد کنید:</p>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>روز</label>
+                        <input type="number" id="age-day" placeholder="1" min="1" max="31">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>ماه</label>
+                        <select id="age-month">
+                            <option value="1">فروردین</option><option value="2">اردیبهشت</option><option value="3">خرداد</option>
+                            <option value="4">تیر</option><option value="5">مرداد</option><option value="6">شهریور</option>
+                            <option value="7">مهر</option><option value="8">آبان</option><option value="9">آذر</option>
+                            <option value="10">دی</option><option value="11">بهمن</option><option value="12">اسفند</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>سال</label>
+                        <input type="number" id="age-year" placeholder="1370">
+                    </div>
+                </div>
+            </div>
+            <button class="action-btn" onclick="calculateAge()">محاسبه سن</button>
+            <div id="age-result" class="result-box"></div>
+        </div>
+
+        <!-- 3. Date Converter -->
+        <div id="date" class="tool-section">
+            <h2>تبدیل تاریخ (شمسی ↔ میلادی)</h2>
+            <div class="form-group">
+                <label>نوع تبدیل</label>
+                <select id="date-type" onchange="toggleDateInputs()">
+                    <option value="s2g">شمسی به میلادی</option>
+                    <option value="g2s">میلادی به شمسی</option>
+                </select>
+            </div>
+            <div class="row">
+                <div class="col"><input type="number" id="d-day" placeholder="روز"></div>
+                <div class="col"><input type="number" id="d-month" placeholder="ماه"></div>
+                <div class="col"><input type="number" id="d-year" placeholder="سال"></div>
+            </div>
+            <br>
+            <button class="action-btn" onclick="convertDate()">تبدیل</button>
+            <div id="date-result" class="result-box"></div>
+        </div>
+
+        <!-- 4. Unit Converter -->
+        <div id="unit" class="tool-section">
+            <h2>تبدیل واحدهای اندازه‌گیری</h2>
+            <div class="form-group">
+                <label>دسته بندی</label>
+                <select id="unit-category" onchange="updateUnitOptions()">
+                    <option value="length">طول</option>
+                    <option value="weight">وزن</option>
+                    <option value="temp">دما</option>
+                </select>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>مقدار</label>
+                    <input type="number" id="unit-value" placeholder="0">
+                </div>
+                <div class="col">
+                    <label>از</label>
+                    <select id="unit-from"></select>
+                </div>
+                <div class="col">
+                    <label>به</label>
+                    <select id="unit-to"></select>
+                </div>
+            </div>
+            <br>
+            <button class="action-btn" onclick="convertUnit()">محاسبه</button>
+            <div id="unit-result" class="result-box"></div>
+        </div>
+
+        <!-- 5. Fetal Age & Due Date -->
+        <div id="baby" class="tool-section">
+            <h2>سن جنین و تاریخ زایمان</h2>
+            <p style="font-size: 0.9rem; color: #666;">اولین روز آخرین قاعدگی (LMP) را وارد کنید:</p>
+            <div class="row">
+                <div class="col"><input type="number" id="preg-day" placeholder="روز" min="1" max="31"></div>
+                <div class="col">
+                     <select id="preg-month">
+                        <option value="1">فروردین</option><option value="2">اردیبهشت</option><option value="3">خرداد</option>
+                        <option value="4">تیر</option><option value="5">مرداد</option><option value="6">شهریور</option>
+                        <option value="7">مهر</option><option value="8">آبان</option><option value="9">آذر</option>
+                        <option value="10">دی</option><option value="11">بهمن</option><option value="12">اسفند</option>
+                    </select>
+                </div>
+                <div class="col"><input type="number" id="preg-year" placeholder="سال"></div>
+            </div>
+            <br>
+            <button class="action-btn" onclick="calculatePregnancy()">محاسبه</button>
+            <div id="baby-result" class="result-box"></div>
+        </div>
+
+        <!-- 6. Loan Calculator -->
+        <div id="loan" class="tool-section">
+            <h2>محاسبه اقساط وام</h2>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>مبلغ وام (تومان)</label>
+                        <input type="number" id="loan-amount" placeholder="مثلا 100000000">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>نرخ سود (درصد)</label>
+                        <input type="number" id="loan-rate" placeholder="مثلا 23">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>بازپرداخت (ماه)</label>
+                <input type="number" id="loan-months" placeholder="مثلا 24">
+            </div>
+            <button class="action-btn" onclick="calculateLoan()">محاسبه اقساط</button>
+            <div id="loan-result" class="result-box"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Jalaali JS Library for accurate Date conversion -->
+<script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
+
+<script>
+    // Tab Handling
+    function openTab(tabName) {
+        const contents = document.querySelectorAll('.tool-section');
+        const buttons = document.querySelectorAll('.tab-btn');
+        
+        contents.forEach(content => content.classList.remove('active'));
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById(tabName).classList.add('active');
+        event.currentTarget.classList.add('active');
+        
+        // Hide results when switching tabs
+        document.querySelectorAll('.result-box').forEach(box => box.style.display = 'none');
+    }
+
+    // Helper: Show Result
+    function showResult(elementId, title, value, detail = "") {
+        const box = document.getElementById(elementId);
+        box.innerHTML = `<h3>${title}</h3><div class="result-value">${value}</div><div class="result-detail">${detail}</div>`;
+        box.style.display = 'block';
+    }
+
+    // Helper: Format Number
+    function formatNum(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // --------------------------------------------------
+    // 1. BMI Calculation
+    // --------------------------------------------------
+    function calculateBMI() {
+        const weight = parseFloat(document.getElementById('bmi-weight').value);
+        const heightCm = parseFloat(document.getElementById('bmi-height').value);
+
+        if (!weight || !heightCm) return alert("لطفا وزن و قد را وارد کنید");
+
+        const heightM = heightCm / 100;
+        const bmi = (weight / (heightM * heightM)).toFixed(1);
+        
+        let status = "";
+        let color = "";
+        if (bmi < 18.5) { status = "کمبود وزن"; color = "#f59e0b"; }
+        else if (bmi < 25) { status = "وزن نرمال"; color = "#10b981"; }
+        else if (bmi < 30) { status = "اضافه وزن"; color = "#f97316"; }
+        else { status = "چاقی"; color = "#ef4444"; }
+
+        const detail = `وضعیت بدنی شما: <span style="color:${color}; font-weight:bold">${status}</span> است.`;
+        showResult('bmi-result', 'شاخص توده بدنی (BMI)', bmi, detail);
+    }
+
+    // --------------------------------------------------
+    // 2. Exact Age Calculation
+    // --------------------------------------------------
+    function calculateAge() {
+        const d = parseInt(document.getElementById('age-day').value);
+        const m = parseInt(document.getElementById('age-month').value);
+        const y = parseInt(document.getElementById('age-year').value);
+
+        if (!d || !y) return alert("لطفا تاریخ تولد را کامل وارد کنید");
+
+        // Get current date in Shamsi
+        const today = new Date();
+        const todayJ = jalaali.toJalaali(today);
+        
+        let ageY = todayJ.jy - y;
+        let ageM = todayJ.jm - m;
+        let ageD = todayJ.jd - d;
+
+        if (ageD < 0) {
+            ageM--;
+            // Simplified days in month logic for borrowing
+            ageD += (m <= 6) ? 31 : 30; 
+        }
+        if (ageM < 0) {
+            ageY--;
+            ageM += 12;
+        }
+
+        const resultText = `${ageY} سال و ${ageM} ماه و ${ageD} روز`;
+        const detail = `تاریخ امروز: ${todayJ.jy}/${todayJ.jm}/${todayJ.jd}`;
+        showResult('age-result', 'سن دقیق شما', resultText, detail);
+    }
+
+    // --------------------------------------------------
+    // 3. Date Conversion
+    // --------------------------------------------------
+    function toggleDateInputs() {
+        // Reset result
+        document.getElementById('date-result').style.display = 'none';
+    }
+
+    function convertDate() {
+        const type = document.getElementById('date-type').value;
+        const d = parseInt(document.getElementById('d-day').value);
+        const m = parseInt(document.getElementById('d-month').value);
+        const y = parseInt(document.getElementById('d-year').value);
+
+        if (!d || !m || !y) return alert("لطفا تاریخ را کامل وارد کنید");
+
+        if (type === 's2g') {
+            // Shamsi to Gregorian
+            try {
+                const gDate = jalaali.toGregorian(y, m, d);
+                const dateObj = new Date(gDate.gy, gDate.gm - 1, gDate.gd);
+                const weekDay = dateObj.toLocaleDateString('fa-IR', { weekday: 'long' });
+                showResult('date-result', 'تاریخ میلادی', `${gDate.gy}-${gDate.gm}-${gDate.gd}`, `روز هفته: ${weekDay}`);
+            } catch(e) { alert("تاریخ نامعتبر"); }
+        } else {
+            // Gregorian to Shamsi
+            try {
+                const jDate = jalaali.toJalaali(y, m, d);
+                showResult('date-result', 'تاریخ شمسی', `${jDate.jy}/${jDate.jm}/${jDate.jd}`, "");
+            } catch(e) { alert("تاریخ نامعتبر"); }
+        }
+    }
+
+    // --------------------------------------------------
+    // 4. Unit Converter
+    // --------------------------------------------------
+    const units = {
+        length: { 'm': 'متر', 'km': 'کیلومتر', 'cm': 'سانتی‌متر', 'mm': 'میلی‌متر', 'in': 'اینچ', 'ft': 'فوت' },
+        weight: { 'kg': 'کیلوگرم', 'g': 'گرم', 'lb': 'پوند', 'oz': 'اونس' },
+        temp: { 'c': 'سلسیوس', 'f': 'فارنهایت', 'k': 'کلوین' }
+    };
+
+    const factors = {
+        // Base is Meter
+        length: { 'm': 1, 'km': 1000, 'cm': 0.01, 'mm': 0.001, 'in': 0.0254, 'ft': 0.3048 },
+        // Base is KG
+        weight: { 'kg': 1, 'g': 0.001, 'lb': 0.453592, 'oz': 0.0283495 }
+    };
+
+    function updateUnitOptions() {
+        const cat = document.getElementById('unit-category').value;
+        const fromSel = document.getElementById('unit-from');
+        const toSel = document.getElementById('unit-to');
+        
+        fromSel.innerHTML = '';
+        toSel.innerHTML = '';
+        
+        for (const [key, name] of Object.entries(units[cat])) {
+            fromSel.add(new Option(name, key));
+            toSel.add(new Option(name, key));
+        }
+        // Set defaults different
+        toSel.selectedIndex = 1; 
+    }
+    // Init units
+    updateUnitOptions();
+
+    function convertUnit() {
+        const cat = document.getElementById('unit-category').value;
+        const val = parseFloat(document.getElementById('unit-value').value);
+        const from = document.getElementById('unit-from').value;
+        const to = document.getElementById('unit-to').value;
+
+        if (isNaN(val)) return alert("مقدار را وارد کنید");
+
+        let res = 0;
+        if (cat === 'temp') {
+            // Temp requires special formulas
+            if(from === to) res = val;
+            else if(from === 'c' && to === 'f') res = (val * 9/5) + 32;
+            else if(from === 'c' && to === 'k') res = val + 273.15;
+            else if(from === 'f' && to === 'c') res = (val - 32) * 5/9;
+            else if(from === 'f' && to === 'k') res = (val - 32) * 5/9 + 273.15;
+            else if(from === 'k' && to === 'c') res = val - 273.15;
+            else if(from === 'k' && to === 'f') res = (val - 273.15) * 9/5 + 32;
+        } else {
+            // Factor based conversion
+            const valInBase = val * factors[cat][from];
+            res = valInBase / factors[cat][to];
+        }
+
+        showResult('unit-result', 'نتیجه تبدیل', res.toFixed(4), `${val} ${units[cat][from]} = ${res.toFixed(4)} ${units[cat][to]}`);
+    }
+
+    // --------------------------------------------------
+    // 5. Pregnancy Calculator (LMP + 280 Days)
+    // --------------------------------------------------
+    function calculatePregnancy() {
+        const d = parseInt(document.getElementById('preg-day').value);
+        const m = parseInt(document.getElementById('preg-month').value);
+        const y = parseInt(document.getElementById('preg-year').value);
+
+        if (!d || !y) return alert("لطفا تاریخ آخرین پریود را وارد کنید");
+
+        // Convert LMP Shamsi to Gregorian to do math
+        const gLMP = jalaali.toGregorian(y, m, d);
+        const lmpDate = new Date(gLMP.gy, gLMP.gm - 1, gLMP.gd);
+        const now = new Date();
+
+        // Gestational Age
+        const diffTime = Math.abs(now - lmpDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        const weeks = Math.floor(diffDays / 7);
+        const daysLeft = diffDays % 7;
+
+        // Due Date (LMP + 280 days)
+        const dueDate = new Date(lmpDate);
+        dueDate.setDate(lmpDate.getDate() + 280);
+        
+        // Convert Due Date back to Shamsi
+        const jDue = jalaali.toJalaali(dueDate);
+
+        const resultText = `${weeks} هفته و ${daysLeft} روز`;
+        const detail = `تاریخ تقریبی زایمان: <strong style="color:#e11d48">${jDue.jy}/${jDue.jm}/${jDue.jd}</strong>`;
+        
+        showResult('baby-result', 'سن جنین', resultText, detail);
+    }
+
+    // --------------------------------------------------
+    // 6. Loan Calculator
+    // --------------------------------------------------
+    function calculateLoan() {
+        const amount = parseFloat(document.getElementById('loan-amount').value);
+        const rate = parseFloat(document.getElementById('loan-rate').value);
+        const months = parseInt(document.getElementById('loan-months').value);
+
+        if (!amount || !rate || !months) return alert("لطفا تمام مقادیر را وارد کنید");
+
+        // Monthly Interest Rate
+        const i = (rate / 100) / 12;
+        
+        // PMT Formula: P * ( i(1+i)^n ) / ( (1+i)^n - 1 )
+        let monthlyPayment = 0;
+        if (rate === 0) {
+            monthlyPayment = amount / months;
+        } else {
+            monthlyPayment = (amount * i * Math.pow(1 + i, months)) / (Math.pow(1 + i, months) - 1);
+        }
+
+        const totalPayment = monthlyPayment * months;
+        const totalInterest = totalPayment - amount;
+
+        const resultText = `${formatNum(Math.round(monthlyPayment))} تومان`;
+        const detail = `
+            کل بازپرداخت: ${formatNum(Math.round(totalPayment))} تومان<br>
+            کل سود وام: ${formatNum(Math.round(totalInterest))} تومان
+        `;
+        
+        showResult('loan-result', 'قسط ماهیانه', resultText, detail);
+    }
+</script>
+
+</body>
+</html>
