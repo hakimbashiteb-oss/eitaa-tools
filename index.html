@@ -57,25 +57,39 @@ header.img-header {
     object-fit: cover;
 }
 
-/* تنظیم جای دکمه برگشت روی عکس */
+/* استایل دکمه بازگشت با رنگ سبز تیره */
 #back-btn {
     position: absolute;
-    right: 15px;
-    top: 15px; /* فاصله از بالا */
-    background: rgba(0, 0, 0, 0.4); /* پس زمینه نیمه شفاف دودی */
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
+    
+    /* --- تنظیم محل قرارگیری --- */
+    top: 15px;   /* فاصله از بالا */
+    right: 15px; /* فاصله از راست (برای تغییر به چپ، right را به left تبدیل کنید) */
+    /* ------------------------- */
+
+    /* --- تنظیم رنگ سبز تیره --- */
+    background-color: rgba(6, 78, 59, 0.9); /* سبز زمردی تیره */
+    color: #ffffff; /* رنگ آیکون سفید */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* یک خط نازک سفید دور دکمه برای زیبایی */
+    /* ------------------------- */
+
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    border-radius: 50%; /* دایره کامل */
     cursor: pointer;
-    display: none; /* در صفحه اصلی مخفی است */
+    display: none; /* در صفحه اصلی مخفی است (توسط جاوااسکریپت کنترل می‌شود) */
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
-    z-index: 101; /* روی عکس بیفتد */
-    backdrop-filter: blur(4px); /* افکت مات شیشه‌ای */
+    font-size: 1.1rem;
+    z-index: 101;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3); /* سایه برای دید بهتر */
+    transition: background 0.3s;
 }
+
+/* وقتی موس روی دکمه میرود (برای کامپیوتر) */
+#back-btn:hover {
+    background-color: rgba(6, 78, 59, 1); /* رنگ کامل پررنگ می‌شود */
+}
+
 
         /* Back Button */
         #back-btn {
@@ -904,6 +918,7 @@ header.img-header {
 </script>
 </body>
 </html>
+
 
 
 
