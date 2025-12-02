@@ -35,21 +35,47 @@
         }
 
         /* Header */
-        header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-bottom-left-radius: 25px;
-            border-bottom-right-radius: 25px;
-            box-shadow: 0 10px 20px -10px rgba(37, 99, 235, 0.4);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+       /* استایل جدید مخصوص هدر تصویری */
+header.img-header {
+    padding: 0; /* حذف فاصله‌های اضافی */
+    margin: 0;
+    background: transparent; /* حذف رنگ پس‌زمینه */
+    box-shadow: 0 10px 20px -10px rgba(0,0,0,0.3); /* سایه زیر عکس */
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+    overflow: hidden; /* برای اینکه لبه‌های عکس گرد شود */
+}
 
-        header h1 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
-        header p { margin: 5px 0 0; font-size: 0.85rem; opacity: 0.9; }
+/* تنظیمات عکس */
+.header-image {
+    width: 100%; /* تمام عرض صفحه */
+    height: auto; /* ارتفاع اتوماتیک تا عکس دفرمه نشود */
+    display: block; /* حذف فاصله سفید زیر عکس */
+    object-fit: cover;
+}
+
+/* تنظیم جای دکمه برگشت روی عکس */
+#back-btn {
+    position: absolute;
+    right: 15px;
+    top: 15px; /* فاصله از بالا */
+    background: rgba(0, 0, 0, 0.4); /* پس زمینه نیمه شفاف دودی */
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: none; /* در صفحه اصلی مخفی است */
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    z-index: 101; /* روی عکس بیفتد */
+    backdrop-filter: blur(4px); /* افکت مات شیشه‌ای */
+}
 
         /* Back Button */
         #back-btn {
@@ -195,14 +221,14 @@
 </head>
 <body>
 
-<header>
+<header class="img-header">
+    <!-- دکمه برگشت (روی عکس قرار می‌گیرد) -->
     <button id="back-btn" onclick="goBack()"><i class="fas fa-arrow-right"></i></button>
-    <h1>
-    <img src="logo.png" alt="لوگو" style="width: 100px; height: 100px; vertical-align: middle;">
-</h1>
-
-    <p>همه چیز در مقیاس درست؛ ابزار جامع محاسبات آنلاین</p>
+    
+    <!-- عکس هدر (جایگزین متن‌ها) -->
+    <img src="header.jpg" alt="سربرگ مقیاس" class="header-image">
 </header>
+
 
 <div class="container">
 
@@ -869,5 +895,6 @@
 </script>
 </body>
 </html>
+
 
 
