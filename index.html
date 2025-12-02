@@ -2,553 +2,867 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جعبه ابزار پیشرفته</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مقیاس - ابزار جامع محاسبات آنلاین</title>
+    <!-- فونت وزیر و آیکون‌ها -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-light: #6b7280;
-            --border-radius: 16px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --primary: #2563eb; /* آبی اصلی */
+            --secondary: #4f46e5; /* بنفش */
+            --accent: #f59e0b; /* نارنجی */
+            --success: #10b981;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --radius: 16px;
         }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'Vazir', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            background-color: var(--bg);
+            color: var(--text);
             margin: 0;
-            padding: 15px;
-            display: flex;
-            justify-content: center;
+            padding: 0;
             min-height: 100vh;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 900px;
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
+        /* Header */
         header {
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            padding: 25px;
+            padding: 20px;
+            text-align: center;
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+            box-shadow: 0 10px 20px -10px rgba(37, 99, 235, 0.4);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+        header p { margin: 5px 0 0; font-size: 0.85rem; opacity: 0.9; }
+
+        /* Back Button */
+        #back-btn {
+            position: absolute;
+            right: 20px;
+            top: 25px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none; /* Hidden on home */
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        /* Container */
+        .container {
+            padding: 20px;
+            flex: 1;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Menu Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .menu-btn {
+            background: var(--card);
+            border: none;
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
             text-align: center;
         }
 
-        header h1 { margin: 0; font-size: 1.6rem; }
-        header p { margin-top: 8px; opacity: 0.9; font-size: 0.9rem; }
+        .menu-btn:active { transform: scale(0.96); }
+        .menu-btn i { font-size: 2rem; margin-bottom: 5px; }
+        .menu-btn span { font-weight: bold; font-size: 0.95rem; color: var(--text); }
 
-        /* Scrollable Tabs */
-        .tabs-container {
-            background: #e0e7ff;
-            padding: 5px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
+        /* Colors for Categories */
+        .cat-finance i { color: #10b981; }
+        .cat-health i { color: #ef4444; }
+        .cat-time i { color: #3b82f6; }
+        .cat-unit i { color: #f59e0b; }
+        .cat-other i { color: #8b5cf6; }
 
-        .tabs {
-            display: flex;
-            gap: 5px;
-            padding-bottom: 5px;
-            min-width: max-content; /* Ensures tabs don't squish */
-        }
+        /* Views Logic */
+        .view-section { display: none; animation: fadeIn 0.3s ease; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .tab-btn {
-            padding: 12px 18px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            font-family: 'Vazir', sans-serif;
-            font-size: 0.9rem;
-            color: var(--text-main);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
-        }
-
-        .tab-btn:hover { background: rgba(255,255,255,0.5); }
-        .tab-btn.active {
-            background: white;
-            color: var(--primary);
-            font-weight: bold;
+        /* Forms & Inputs */
+        .tool-card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: var(--radius);
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        .content { padding: 25px; min-height: 400px; }
-        .tool-section { display: none; animation: fadeIn 0.4s ease; }
-        .tool-section.active { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        h2.tool-title {
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--primary);
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; }
+        label { display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 500; }
         
         input, select {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            font-family: 'Vazir', sans-serif;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-family: 'Vazir';
             font-size: 1rem;
-            box-sizing: border-box;
+            transition: 0.3s;
+            background: #f8fafc;
         }
-        input:focus, select:focus { outline: none; border-color: var(--primary); }
+        input:focus, select:focus { outline: none; border-color: var(--primary); background: white; }
 
-        button.action-btn {
+        .row { display: flex; gap: 10px; }
+        .col { flex: 1; }
+
+        /* Buttons */
+        .btn-calc {
             width: 100%;
             padding: 14px;
-            background-color: var(--primary);
+            background: linear-gradient(to right, var(--primary), var(--secondary));
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 1rem;
-            cursor: pointer;
-            font-family: 'Vazir', sans-serif;
             font-weight: bold;
+            cursor: pointer;
             margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
-        button.action-btn.secondary { background-color: #10b981; margin-top: 5px; }
 
+        /* Results */
         .result-box {
-            margin-top: 25px;
-            padding: 20px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            display: none;
-            text-align: center;
-        }
-        .result-value { font-size: 1.4rem; font-weight: bold; color: var(--primary); margin: 10px 0; }
-        .result-detail { color: var(--text-light); line-height: 1.8; font-size: 0.95rem; text-align: right; }
-
-        .row { display: flex; gap: 15px; }
-        .col { flex: 1; }
-        @media (max-width: 600px) { .row { flex-direction: column; gap: 10px; } }
-        
-        /* Specific for Password */
-        .password-display {
-            background: #374151;
-            color: #fff;
+            margin-top: 20px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #064e3b;
             padding: 15px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 1.2rem;
-            word-break: break-all;
-            margin-bottom: 10px;
+            border-radius: 12px;
+            display: none;
         }
+        .result-title { font-size: 0.85rem; color: #059669; margin-bottom: 5px; }
+        .result-value { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
+        .result-desc { font-size: 0.9rem; line-height: 1.6; color: #334155; }
+
+        /* Special Tables (Currency) */
+        .currency-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+        .currency-table th, .currency-table td { padding: 10px; text-align: center; border-bottom: 1px solid #eee; }
+        .currency-table th { background: #f1f5f9; color: #64748b; }
+
+        /* GPA Dynamic Rows */
+        .gpa-row { display: flex; gap: 5px; margin-bottom: 8px; align-items: center; }
+        .btn-small { padding: 5px 10px; background: #eee; border-radius: 6px; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
+<header>
+    <button id="back-btn" onclick="goBack()"><i class="fas fa-arrow-right"></i></button>
+    <h1>مقیاس</h1>
+    <p>همه چیز در مقیاس درست؛ ابزار جامع محاسبات</p>
+</header>
+
 <div class="container">
-    <header>
-        <h1><i class="fas fa-shapes"></i> جعبه ابزار همه‌کاره</h1>
-        <p>۱۰ ابزار کاربردی و دقیق در جیب شما</p>
-    </header>
 
-    <!-- Scrollable Tabs -->
-    <div class="tabs-container">
-        <div class="tabs">
-            <button class="tab-btn active" onclick="openTab('gold')"><i class="fas fa-coins"></i> قیمت طلا</button>
-            <button class="tab-btn" onclick="openTab('discount')"><i class="fas fa-tags"></i> تخفیف</button>
-            <button class="tab-btn" onclick="openTab('pass')"><i class="fas fa-key"></i> پسورد</button>
-            <button class="tab-btn" onclick="openTab('bmi')"><i class="fas fa-weight"></i> BMI</button>
-            <button class="tab-btn" onclick="openTab('calories')"><i class="fas fa-fire"></i> کالری</button>
-            <button class="tab-btn" onclick="openTab('age')"><i class="fas fa-birthday-cake"></i> سن</button>
-            <button class="tab-btn" onclick="openTab('date')"><i class="fas fa-calendar-alt"></i> تاریخ</button>
-            <button class="tab-btn" onclick="openTab('loan')"><i class="fas fa-money-bill-wave"></i> وام</button>
-            <button class="tab-btn" onclick="openTab('unit')"><i class="fas fa-ruler-combined"></i> واحد</button>
-            <button class="tab-btn" onclick="openTab('baby')"><i class="fas fa-baby"></i> نوزاد</button>
+    <!-- 1. Home Page (Main Menu) -->
+    <div id="view-home" class="view-section active">
+        <div class="menu-grid">
+            <button class="menu-btn cat-finance" onclick="navTo('cat-finance')">
+                <i class="fas fa-coins"></i>
+                <span>محاسبات مالی</span>
+            </button>
+            <button class="menu-btn cat-health" onclick="navTo('cat-health')">
+                <i class="fas fa-heartbeat"></i>
+                <span>سلامت و پزشکی</span>
+            </button>
+            <button class="menu-btn cat-time" onclick="navTo('cat-time')">
+                <i class="fas fa-clock"></i>
+                <span>زمان و تاریخ</span>
+            </button>
+            <button class="menu-btn cat-unit" onclick="navTo('cat-unit')">
+                <i class="fas fa-ruler-combined"></i>
+                <span>تبدیل واحد</span>
+            </button>
+            <button class="menu-btn cat-other" onclick="navTo('cat-other')">
+                <i class="fas fa-graduation-cap"></i>
+                <span>سایر محاسبات</span>
+            </button>
         </div>
     </div>
 
-    <div class="content">
+    <!-- ================= CATEGORIES ================= -->
 
-        <!-- 1. Gold Calculator (NEW) -->
-        <div id="gold" class="tool-section active">
-            <h2><i class="fas fa-calculator"></i> محاسبه قیمت طلا</h2>
-            <p class="text-light">محاسبه دقیق قیمت خرید طلا با اجرت و سود قانونی</p>
-            <div class="row">
-                <div class="col">
-                    <label>قیمت روز یک گرم طلای ۱۸ (تومان)</label>
-                    <input type="number" id="gold-price" placeholder="مثلا 3500000">
-                </div>
-                <div class="col">
-                    <label>وزن طلا (گرم)</label>
-                    <input type="number" id="gold-weight" placeholder="مثلا 5.2">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <label>اجرت ساخت (درصد)</label>
-                    <input type="number" id="gold-wage" placeholder="معمولا بین 10 تا 25">
-                </div>
-                <div class="col">
-                    <label>سود فروشنده (درصد)</label>
-                    <input type="number" id="gold-profit" value="7" readonly style="background:#eee">
-                </div>
-            </div>
-            <button class="action-btn" onclick="calcGold()">محاسبه قیمت نهایی</button>
-            <div id="gold-result" class="result-box"></div>
+    <!-- 2. Financial Category -->
+    <div id="view-cat-finance" class="view-section">
+        <div class="menu-grid">
+            <button class="menu-btn" onclick="navTo('tool-gold')"><i class="fas fa-gem text-gold"></i><span>قیمت طلا</span></button>
+            <button class="menu-btn" onclick="navTo('tool-loan')"><i class="fas fa-money-check-alt"></i><span>اقساط وام</span></button>
+            <button class="menu-btn" onclick="navTo('tool-deposit')"><i class="fas fa-piggy-bank"></i><span>سود سپرده</span></button>
+            <button class="menu-btn" onclick="navTo('tool-discount')"><i class="fas fa-percent"></i><span>تخفیف</span></button>
+            <button class="menu-btn" onclick="navTo('tool-rates')"><i class="fas fa-chart-line"></i><span>نرخ ارز و طلا</span></button>
         </div>
+    </div>
 
-        <!-- 2. Discount Calculator (NEW) -->
-        <div id="discount" class="tool-section">
-            <h2><i class="fas fa-percent"></i> محاسبه تخفیف</h2>
-            <div class="row">
-                <div class="col">
-                    <label>قیمت اصلی (تومان)</label>
-                    <input type="number" id="disc-price" placeholder="مثلا 500000">
-                </div>
-                <div class="col">
-                    <label>درصد تخفیف</label>
-                    <input type="number" id="disc-percent" placeholder="مثلا 30">
-                </div>
-            </div>
-            <button class="action-btn" onclick="calcDiscount()">محاسبه</button>
-            <div id="disc-result" class="result-box"></div>
+    <!-- 3. Health Category -->
+    <div id="view-cat-health" class="view-section">
+        <div class="menu-grid">
+            <button class="menu-btn" onclick="navTo('tool-bmi')"><i class="fas fa-weight"></i><span>شاخص BMI</span></button>
+            <button class="menu-btn" onclick="navTo('tool-bmr')"><i class="fas fa-fire"></i><span>سوخت و ساز (BMR)</span></button>
+            <button class="menu-btn" onclick="navTo('tool-tdee')"><i class="fas fa-running"></i><span>کالری روزانه (TDEE)</span></button>
+            <button class="menu-btn" onclick="navTo('tool-ibw')"><i class="fas fa-child"></i><span>وزن ایده‌آل</span></button>
+            <button class="menu-btn" onclick="navTo('tool-whr')"><i class="fas fa-ruler-horizontal"></i><span>کمر به لگن (WHR)</span></button>
+            <button class="menu-btn" onclick="navTo('tool-preg')"><i class="fas fa-baby"></i><span>سن جنین و زایمان</span></button>
         </div>
+    </div>
 
-        <!-- 3. Password Generator (NEW) -->
-        <div id="pass" class="tool-section">
-            <h2><i class="fas fa-lock"></i> ساخت رمز عبور قوی</h2>
+    <!-- 4. Time Category -->
+    <div id="view-cat-time" class="view-section">
+        <div class="menu-grid">
+            <button class="menu-btn" onclick="navTo('tool-age')"><i class="fas fa-birthday-cake"></i><span>محاسبه دقیق سن</span></button>
+            <button class="menu-btn" onclick="navTo('tool-date-conv')"><i class="fas fa-sync-alt"></i><span>تبدیل تاریخ</span></button>
+            <button class="menu-btn" onclick="navTo('tool-date-diff')"><i class="fas fa-hourglass-half"></i><span>اختلاف تاریخ</span></button>
+            <button class="menu-btn" onclick="navTo('tool-date-calc')"><i class="fas fa-calculator"></i><span>ماشین حساب تاریخ</span></button>
+            <button class="menu-btn" onclick="navTo('tool-day-find')"><i class="fas fa-calendar-day"></i><span>یابنده روز هفته</span></button>
+            <button class="menu-btn" onclick="navTo('tool-world-clock')"><i class="fas fa-globe"></i><span>ساعت جهانی</span></button>
+        </div>
+    </div>
+
+    <!-- 5. Unit Category -->
+    <div id="view-cat-unit" class="view-section">
+        <div class="menu-grid">
+            <button class="menu-btn" onclick="navTo('tool-unit-mass')"><i class="fas fa-weight-hanging"></i><span>وزن و جرم</span></button>
+            <button class="menu-btn" onclick="navTo('tool-unit-len')"><i class="fas fa-ruler"></i><span>طول و مسافت</span></button>
+            <button class="menu-btn" onclick="navTo('tool-unit-temp')"><i class="fas fa-thermometer-half"></i><span>دما</span></button>
+            <button class="menu-btn" onclick="navTo('tool-unit-area')"><i class="fas fa-vector-square"></i><span>مساحت</span></button>
+        </div>
+    </div>
+
+     <!-- 6. Other Category -->
+     <div id="view-cat-other" class="view-section">
+        <div class="menu-grid">
+            <button class="menu-btn" onclick="navTo('tool-gpa')"><i class="fas fa-poll"></i><span>محاسبه معدل</span></button>
+        </div>
+    </div>
+
+    <!-- ================= TOOLS UI ================= -->
+
+    <!-- Tool: Gold Price -->
+    <div id="view-tool-gold" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title"><i class="fas fa-gem"></i> محاسبه قیمت طلا</h2>
+            <div class="form-group"><label>قیمت گرم طلای خام (تومان)</label><input type="number" id="gold-price"></div>
             <div class="row">
-                <div class="col">
-                    <label>طول رمز عبور</label>
-                    <select id="pass-len">
-                        <option value="8">8 کاراکتر (معمولی)</option>
-                        <option value="12" selected>12 کاراکتر (قوی)</option>
-                        <option value="16">16 کاراکتر (خیلی قوی)</option>
+                <div class="col"><label>وزن (گرم)</label><input type="number" id="gold-weight"></div>
+                <div class="col"><label>اجرت (%)</label><input type="number" id="gold-wage"></div>
+            </div>
+            <div class="row">
+                <div class="col"><label>سود (%)</label><input type="number" id="gold-profit" value="7"></div>
+                <div class="col"><label>مالیات (%)</label><input type="number" id="gold-tax" value="9"></div>
+            </div>
+            <button class="btn-calc" onclick="calcGold()">محاسبه</button>
+            <div id="res-gold" class="result-box"></div>
+        </div>
+    </div>
+
+    <!-- Tool: Rates (Embed) -->
+    <div id="view-tool-rates" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title"><i class="fas fa-chart-line"></i> نرخ لحظه‌ای بازار</h2>
+            <p style="font-size:0.8rem; color:orange; margin-bottom:10px">برای نمایش باید به اینترنت متصل باشید.</p>
+            <div id="navasan_table_container" style="overflow-x:auto;">در حال بارگذاری...</div>
+        </div>
+    </div>
+
+    <!-- Tool: Loan -->
+    <div id="view-tool-loan" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title"><i class="fas fa-money-check-alt"></i> محاسبه وام</h2>
+            <label>مبلغ وام (تومان)</label><input type="number" id="loan-amount">
+            <div class="row" style="margin-top:10px">
+                <div class="col"><label>سود سالیانه (%)</label><input type="number" id="loan-rate" value="23"></div>
+                <div class="col"><label>مدت (ماه)</label><input type="number" id="loan-month"></div>
+            </div>
+            <button class="btn-calc" onclick="calcLoan()">محاسبه اقساط</button>
+            <div id="res-loan" class="result-box"></div>
+        </div>
+    </div>
+
+    <!-- Tool: Deposit -->
+    <div id="view-tool-deposit" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title"><i class="fas fa-piggy-bank"></i> محاسبه سود سپرده</h2>
+            <label>مبلغ سپرده (تومان)</label><input type="number" id="dep-amount">
+            <div class="row" style="margin-top:10px">
+                <div class="col"><label>نرخ سود (%)</label><input type="number" id="dep-rate"></div>
+                <div class="col"><label>نوع</label>
+                    <select id="dep-type">
+                        <option value="monthly">ماه‌شمار</option>
+                        <option value="yearly">سالانه (یکجا)</option>
                     </select>
                 </div>
-                <div class="col">
-                    <label style="margin-top:30px">
-                        <input type="checkbox" id="pass-symbol" checked style="width:auto"> شامل !@#$%
-                    </label>
-                </div>
             </div>
-            <button class="action-btn" onclick="genPass()">تولید رمز جدید</button>
-            <div id="pass-result" class="result-box" style="display:block; margin-top:10px">
-                <div id="pass-text" class="password-display">روی دکمه بالا بزنید</div>
-                <button class="action-btn secondary" onclick="copyPass()" style="padding:8px; font-size:0.9rem">کپی کردن</button>
-            </div>
+            <button class="btn-calc" onclick="calcDeposit()">محاسبه سود</button>
+            <div id="res-dep" class="result-box"></div>
         </div>
+    </div>
 
-        <!-- 4. Calories BMR (NEW) -->
-        <div id="calories" class="tool-section">
-            <h2><i class="fas fa-apple-alt"></i> محاسبه کالری مورد نیاز</h2>
-            <div class="row">
-                <div class="col">
-                    <label>جنسیت</label>
-                    <select id="cal-gender">
-                        <option value="m">مرد</option>
-                        <option value="f">زن</option>
-                    </select>
-                </div>
-                <div class="col">
-                    <label>سن</label>
-                    <input type="number" id="cal-age">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <label>قد (سانتی‌متر)</label>
-                    <input type="number" id="cal-height">
-                </div>
-                <div class="col">
-                    <label>وزن (کیلوگرم)</label>
-                    <input type="number" id="cal-weight">
-                </div>
-            </div>
+    <!-- Tool: Discount -->
+    <div id="view-tool-discount" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title"><i class="fas fa-percent"></i> محاسبه تخفیف</h2>
+            <label>قیمت اصلی</label><input type="number" id="disc-price">
+            <label>درصد تخفیف</label><input type="number" id="disc-per">
+            <button class="btn-calc" onclick="calcDisc()">محاسبه</button>
+            <div id="res-disc" class="result-box"></div>
+        </div>
+    </div>
+
+    <!-- Tool: Health Forms (Simplified Layout for brevity) -->
+    <div id="view-tool-bmi" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title">شاخص توده بدنی (BMI)</h2>
+            <div class="row"><div class="col"><input type="number" id="bmi-w" placeholder="وزن (kg)"></div><div class="col"><input type="number" id="bmi-h" placeholder="قد (cm)"></div></div>
+            <button class="btn-calc" onclick="calcBMI()">محاسبه</button>
+            <div id="res-bmi" class="result-box"></div>
+        </div>
+    </div>
+    
+    <div id="view-tool-bmr" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title">نرخ سوخت و ساز پایه (BMR)</h2>
+            <div class="row"><div class="col"><select id="bmr-g"><option value="m">مرد</option><option value="f">زن</option></select></div><div class="col"><input type="number" id="bmr-a" placeholder="سن"></div></div>
+            <div class="row" style="margin-top:10px"><div class="col"><input type="number" id="bmr-w" placeholder="وزن (kg)"></div><div class="col"><input type="number" id="bmr-h" placeholder="قد (cm)"></div></div>
+            <button class="btn-calc" onclick="calcBMR()">محاسبه</button>
+            <div id="res-bmr" class="result-box"></div>
+        </div>
+    </div>
+
+    <div id="view-tool-tdee" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title">کالری مورد نیاز روزانه (TDEE)</h2>
+            <p style="font-size:0.8rem">ابتدا اطلاعات BMR را بالا پر کنید یا اینجا وارد کنید:</p>
+            <div class="row"><div class="col"><select id="tdee-g"><option value="m">مرد</option><option value="f">زن</option></select></div><div class="col"><input type="number" id="tdee-a" placeholder="سن"></div></div>
+            <div class="row" style="margin-top:10px"><div class="col"><input type="number" id="tdee-w" placeholder="وزن"></div><div class="col"><input type="number" id="tdee-h" placeholder="قد"></div></div>
             <label>میزان فعالیت</label>
-            <select id="cal-activity">
-                <option value="1.2">کم تحرک (پشت میز نشین)</option>
-                <option value="1.375">کمی فعال (ورزش ۱-۳ روز)</option>
-                <option value="1.55">متوسط (ورزش ۳-۵ روز)</option>
-                <option value="1.725">خیلی فعال (ورزش هر روز)</option>
+            <select id="tdee-act">
+                <option value="1.2">بدون ورزش (پشت میز نشین)</option>
+                <option value="1.375">کم (1-3 روز در هفته)</option>
+                <option value="1.55">متوسط (3-5 روز در هفته)</option>
+                <option value="1.725">زیاد (6-7 روز در هفته)</option>
+                <option value="1.9">بسیار زیاد (شغل سخت/ورزش حرفه ای)</option>
             </select>
-            <button class="action-btn" onclick="calcCalories()">محاسبه کالری</button>
-            <div id="cal-result" class="result-box"></div>
+            <button class="btn-calc" onclick="calcTDEE()">محاسبه</button>
+            <div id="res-tdee" class="result-box"></div>
         </div>
-
-        <!-- 5. BMI -->
-        <div id="bmi" class="tool-section">
-            <h2>محاسبه شاخص توده بدنی</h2>
-            <div class="row">
-                <div class="col"><label>وزن (kg)</label><input type="number" id="bmi-weight"></div>
-                <div class="col"><label>قد (cm)</label><input type="number" id="bmi-height"></div>
-            </div>
-            <button class="action-btn" onclick="calculateBMI()">محاسبه</button>
-            <div id="bmi-result" class="result-box"></div>
-        </div>
-
-        <!-- 6. Exact Age -->
-        <div id="age" class="tool-section">
-            <h2>محاسبه دقیق سن</h2>
-            <div class="row">
-                <div class="col"><input type="number" id="age-day" placeholder="روز"></div>
-                <div class="col">
-                    <select id="age-month">
-                        <option value="1">فروردین</option><option value="2">اردیبهشت</option><option value="3">خرداد</option>
-                        <option value="4">تیر</option><option value="5">مرداد</option><option value="6">شهریور</option>
-                        <option value="7">مهر</option><option value="8">آبان</option><option value="9">آذر</option>
-                        <option value="10">دی</option><option value="11">بهمن</option><option value="12">اسفند</option>
-                    </select>
-                </div>
-                <div class="col"><input type="number" id="age-year" placeholder="سال"></div>
-            </div>
-            <button class="action-btn" onclick="calculateAge()">محاسبه</button>
-            <div id="age-result" class="result-box"></div>
-        </div>
-
-        <!-- 7. Date Converter -->
-        <div id="date" class="tool-section">
-            <h2>تبدیل تاریخ</h2>
-            <select id="date-type" onchange="toggleDateInputs()"><option value="s2g">شمسی به میلادی</option><option value="g2s">میلادی به شمسی</option></select>
-            <div class="row" style="margin-top:10px">
-                <div class="col"><input type="number" id="d-day" placeholder="روز"></div>
-                <div class="col"><input type="number" id="d-month" placeholder="ماه"></div>
-                <div class="col"><input type="number" id="d-year" placeholder="سال"></div>
-            </div>
-            <button class="action-btn" onclick="convertDate()">تبدیل</button>
-            <div id="date-result" class="result-box"></div>
-        </div>
-
-        <!-- 8. Loan -->
-        <div id="loan" class="tool-section">
-            <h2>محاسبه اقساط وام</h2>
-            <div class="row">
-                <div class="col"><label>مبلغ (تومان)</label><input type="number" id="loan-amount"></div>
-                <div class="col"><label>درصد سود</label><input type="number" id="loan-rate"></div>
-            </div>
-            <label>تعداد اقساط (ماه)</label><input type="number" id="loan-months">
-            <button class="action-btn" onclick="calculateLoan()">محاسبه</button>
-            <div id="loan-result" class="result-box"></div>
-        </div>
-
-        <!-- 9. Unit Converter -->
-        <div id="unit" class="tool-section">
-            <h2>تبدیل واحد</h2>
-            <select id="unit-category" onchange="updateUnitOptions()"><option value="length">طول</option><option value="weight">وزن</option><option value="temp">دما</option></select>
-            <div class="row" style="margin-top:10px">
-                <div class="col"><input type="number" id="unit-value" placeholder="مقدار"></div>
-                <div class="col"><select id="unit-from"></select></div>
-                <div class="col"><select id="unit-to"></select></div>
-            </div>
-            <button class="action-btn" onclick="convertUnit()">محاسبه</button>
-            <div id="unit-result" class="result-box"></div>
-        </div>
-
-        <!-- 10. Fetal Age -->
-        <div id="baby" class="tool-section">
-            <h2>سن جنین (از روی LMP)</h2>
-            <div class="row">
-                <div class="col"><input type="number" id="preg-day" placeholder="روز"></div>
-                <div class="col"><select id="preg-month"><option value="1">فروردین</option><option value="2">اردیبهشت</option><option value="3">خرداد</option><option value="4">تیر</option><option value="5">مرداد</option><option value="6">شهریور</option><option value="7">مهر</option><option value="8">آبان</option><option value="9">آذر</option><option value="10">دی</option><option value="11">بهمن</option><option value="12">اسفند</option></select></div>
-                <div class="col"><input type="number" id="preg-year" placeholder="سال"></div>
-            </div>
-            <button class="action-btn" onclick="calculatePregnancy()">محاسبه</button>
-            <div id="baby-result" class="result-box"></div>
-        </div>
-
     </div>
-</div>
 
+    <div id="view-tool-ibw" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title">وزن ایده‌آل</h2>
+            <div class="row"><div class="col"><select id="ibw-g"><option value="m">مرد</option><option value="f">زن</option></select></div><div class="col"><input type="number" id="ibw-h" placeholder="قد (cm)"></div></div>
+            <button class="btn-calc" onclick="calcIBW()">محاسبه</button>
+            <div id="res-ibw" class="result-box"></div>
+        </div>
+    </div>
+
+    <div id="view-tool-whr" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title">نسبت کمر به لگن (WHR)</h2>
+            <div class="row"><div class="col"><input type="number" id="whr-w" placeholder="دور کمر (cm)"></div><div class="col"><input type="number" id="whr-h" placeholder="دور باسن (cm)"></div></div>
+             <label>جنسیت</label><select id="whr-g"><option value="m">مرد</option><option value="f">زن</option></select>
+            <button class="btn-calc" onclick="calcWHR()">محاسبه</button>
+            <div id="res-whr" class="result-box"></div>
+        </div>
+    </div>
+
+    <div id="view-tool-preg" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title">سن جنین و زایمان</h2>
+            <p style="font-size:0.8rem">تاریخ اولین روز آخرین قاعدگی (LMP)</p>
+            <div class="row">
+                <div class="col"><input type="number" id="preg-d" placeholder="روز"></div>
+                <div class="col"><select id="preg-m"><option value="1">فروردین</option><option value="2">اردیبهشت</option><option value="3">خرداد</option><option value="4">تیر</option><option value="5">مرداد</option><option value="6">شهریور</option><option value="7">مهر</option><option value="8">آبان</option><option value="9">آذر</option><option value="10">دی</option><option value="11">بهمن</option><option value="12">اسفند</option></select></div>
+                <div class="col"><input type="number" id="preg-y" placeholder="سال"></div>
+            </div>
+            <button class="btn-calc" onclick="calcPreg()">محاسبه</button>
+            <div id="res-preg" class="result-box"></div>
+        </div>
+    </div>
+
+    <!-- Tool: Time Forms -->
+    <div id="view-tool-age" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title">محاسبه دقیق سن</h2>
+            <div class="row">
+                <div class="col"><input type="number" id="age-d" placeholder="روز"></div>
+                <div class="col"><select id="age-m"><option value="1">فروردین</option><option value="2">اردیبهشت</option><option value="3">خرداد</option><option value="4">تیر</option><option value="5">مرداد</option><option value="6">شهریور</option><option value="7">مهر</option><option value="8">آبان</option><option value="9">آذر</option><option value="10">دی</option><option value="11">بهمن</option><option value="12">اسفند</option></select></div>
+                <div class="col"><input type="number" id="age-y" placeholder="سال"></div>
+            </div>
+            <button class="btn-calc" onclick="calcAge()">شروع محاسبه</button>
+            <div id="res-age" class="result-box"></div>
+        </div>
+    </div>
+
+    <div id="view-tool-date-conv" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title">تبدیل تاریخ</h2>
+            <select id="conv-type" onchange="uiDateConv()">
+                <option value="s2g">شمسی به میلادی</option>
+                <option value="g2s">میلادی به شمسی</option>
+                <option value="s2h">شمسی به قمری</option>
+            </select>
+            <div class="row" style="margin-top:10px">
+                <div class="col"><input type="number" id="conv-d" placeholder="روز"></div>
+                <div class="col"><input type="number" id="conv-m" placeholder="ماه"></div>
+                <div class="col"><input type="number" id="conv-y" placeholder="سال"></div>
+            </div>
+            <button class="btn-calc" onclick="calcDateConv()">تبدیل</button>
+            <div id="res-conv" class="result-box"></div>
+        </div>
+    </div>
+
+    <div id="view-tool-date-diff" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title">اختلاف دو تاریخ</h2>
+            <label>تاریخ اول (شمسی)</label>
+            <div class="row"><div class="col"><input id="d1-d" placeholder="روز"></div><div class="col"><input id="d1-m" placeholder="ماه"></div><div class="col"><input id="d1-y" placeholder="سال"></div></div>
+            <label style="margin-top:10px">تاریخ دوم (شمسی)</label>
+            <div class="row"><div class="col"><input id="d2-d" placeholder="روز"></div><div class="col"><input id="d2-m" placeholder="ماه"></div><div class="col"><input id="d2-y" placeholder="سال"></div></div>
+            <button class="btn-calc" onclick="calcDateDiff()">محاسبه اختلاف</button>
+            <div id="res-diff" class="result-box"></div>
+        </div>
+    </div>
+
+    <div id="view-tool-date-calc" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title">ماشین حساب تاریخ</h2>
+            <div class="row"><div class="col"><input id="dc-d" placeholder="روز"></div><div class="col"><input id="dc-m" placeholder="ماه"></div><div class="col"><input id="dc-y" placeholder="سال"></div></div>
+            <div class="row" style="margin-top:10px">
+                <div class="col"><select id="dc-op"><option value="add">اضافه کردن</option><option value="sub">کم کردن</option></select></div>
+                <div class="col"><input type="number" id="dc-val" placeholder="تعداد روز"></div>
+            </div>
+            <button class="btn-calc" onclick="calcDateMath()">محاسبه</button>
+            <div id="res-dc" class="result-box"></div>
+        </div>
+    </div>
+
+     <div id="view-tool-day-find" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title">یابنده روز هفته</h2>
+            <div class="row"><div class="col"><input id="df-d" placeholder="روز"></div><div class="col"><input id="df-m" placeholder="ماه"></div><div class="col"><input id="df-y" placeholder="سال"></div></div>
+            <button class="btn-calc" onclick="calcDayFind()">پیدا کن</button>
+            <div id="res-df" class="result-box"></div>
+        </div>
+    </div>
+
+    <div id="view-tool-world-clock" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title">ساعت جهانی</h2>
+            <div id="clocks-container" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; text-align:center;">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Tool: Units -->
+    <div id="view-tool-unit-mass" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title">تبدیل وزن و جرم</h2>
+            <input type="number" id="u-m-val" placeholder="مقدار را وارد کنید">
+            <div class="row" style="margin-top:10px">
+                <div class="col"><select id="u-m-from"></select></div>
+                <div class="col"><i class="fas fa-arrow-left" style="margin-top:10px"></i></div>
+                <div class="col"><select id="u-m-to"></select></div>
+            </div>
+            <button class="btn-calc" onclick="calcUnit('mass')">تبدیل</button>
+            <div id="res-u-mass" class="result-box"></div>
+        </div>
+    </div>
+    <!-- Repeat structure for Length, Temp, Area (handled by Generic JS logic to save space, see JS part) -->
+    <div id="view-tool-unit-len" class="view-section">
+        <div class="tool-card"><h2 class="tool-title">تبدیل طول</h2><input type="number" id="u-l-val"><div class="row" style="margin-top:10px"><div class="col"><select id="u-l-from"></select></div><div class="col">به</div><div class="col"><select id="u-l-to"></select></div></div><button class="btn-calc" onclick="calcUnit('len')">تبدیل</button><div id="res-u-len" class="result-box"></div></div>
+    </div>
+    <div id="view-tool-unit-temp" class="view-section">
+        <div class="tool-card"><h2 class="tool-title">تبدیل دما</h2><input type="number" id="u-t-val"><div class="row" style="margin-top:10px"><div class="col"><select id="u-t-from"></select></div><div class="col">به</div><div class="col"><select id="u-t-to"></select></div></div><button class="btn-calc" onclick="calcUnit('temp')">تبدیل</button><div id="res-u-temp" class="result-box"></div></div>
+    </div>
+    <div id="view-tool-unit-area" class="view-section">
+        <div class="tool-card"><h2 class="tool-title">تبدیل مساحت</h2><input type="number" id="u-a-val"><div class="row" style="margin-top:10px"><div class="col"><select id="u-a-from"></select></div><div class="col">به</div><div class="col"><select id="u-a-to"></select></div></div><button class="btn-calc" onclick="calcUnit('area')">تبدیل</button><div id="res-u-area" class="result-box"></div></div>
+    </div>
+
+    <!-- Tool: GPA -->
+    <div id="view-tool-gpa" class="view-section">
+        <div class="tool-card">
+            <h2 class="tool-title">محاسبه معدل</h2>
+            <div id="gpa-rows">
+                <!-- Rows added by JS -->
+            </div>
+            <button class="btn-small" onclick="addGpaRow()" style="margin-top:10px">+ افزودن درس</button>
+            <button class="btn-calc" onclick="calcGPA()">محاسبه معدل کل</button>
+            <div id="res-gpa" class="result-box"></div>
+        </div>
+    </div>
+
+</div>
+<!-- External Libs for Date and Rates -->
 <script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
+<!-- User provided navasan script logic container -->
+<script>function navasanret(data){
+    try {
+        const d = JSON.parse(data);
+        let h = '<table class="currency-table"><thead><tr><th>عنوان</th><th>قیمت (تومان/دلار)</th></tr></thead><tbody>';
+        // Selected items to display
+        const items = {
+            'usd_shakhs': 'دلار', 'eur_hav': 'یورو', 'sekkeh': 'سکه امامی', 
+            'bahar': 'سکه بهار', '18ayar': 'طلای 18', 'btc': 'بیت کوین', 'usdt': 'تتر'
+        };
+        for(let k in items) {
+            if(d[k]) h += `<tr><td>${items[k]}</td><td>${parseInt(d[k].value).toLocaleString()}</td></tr>`;
+        }
+        h += '</tbody></table>';
+        document.getElementById('navasan_table_container').innerHTML = h;
+    } catch(e) { document.getElementById('navasan_table_container').innerHTML = "خطا در دریافت اطلاعات"; }
+}</script>
+<script src="https://www.navasan.tech/wp-navasan.php?usd_shakhs&eur_hav&sekkeh&bahar&18ayar&btc&usdt"></script>
 
 <script>
-    // ---- Core Functions ----
-    function openTab(tabName) {
-        document.querySelectorAll('.tool-section').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabName).classList.add('active');
-        event.currentTarget.classList.add('active');
-        document.querySelectorAll('.result-box').forEach(b => {if(b.id !== 'pass-result') b.style.display = 'none'});
+    // --- Navigation System ---
+    const historyStack = [];
+    function navTo(viewId) {
+        const current = document.querySelector('.view-section.active');
+        if(current) historyStack.push(current.id);
+        
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        // Handle Category vs Tool naming
+        let targetId = viewId.startsWith('view-') ? viewId : 'view-' + viewId;
+        document.getElementById(targetId).classList.add('active');
+        
+        // Back button visibility
+        document.getElementById('back-btn').style.display = 'flex';
+        window.scrollTo(0,0);
     }
-    function showResult(id, title, val, det = "") {
-        const b = document.getElementById(id);
-        b.innerHTML = `<h3>${title}</h3><div class="result-value">${val}</div><div class="result-detail">${det}</div>`;
+
+    function goBack() {
+        if(historyStack.length === 0) return;
+        const prev = historyStack.pop();
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        document.getElementById(prev).classList.add('active');
+        
+        if(prev === 'view-home') document.getElementById('back-btn').style.display = 'none';
+    }
+
+    // --- Helpers ---
+    const $ = id => document.getElementById(id);
+    const val = id => parseFloat($(id).value) || 0;
+    const setRes = (id, title, val, desc) => {
+        const b = $(id);
+        b.innerHTML = `<div class="result-title">${title}</div><div class="result-value">${val}</div><div class="result-desc">${desc}</div>`;
         b.style.display = 'block';
-    }
-    function formatNum(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+    };
+    const fmt = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-    // ---- 1. Gold Calculator ----
+    // --- Financial ---
     function calcGold() {
-        const price = parseFloat(document.getElementById('gold-price').value);
-        const weight = parseFloat(document.getElementById('gold-weight').value);
-        const wage = parseFloat(document.getElementById('gold-wage').value); // Percent
+        const p = val('gold-price'), w = val('gold-weight'), wageP = val('gold-wage'), profP = val('gold-profit'), taxP = val('gold-tax');
+        if(!p || !w) return alert('قیمت و وزن را وارد کنید');
         
-        if(!price || !weight || isNaN(wage)) return alert('لطفا قیمت، وزن و اجرت را وارد کنید');
-
-        // 1. Gold Price + Wage
-        const goldPlusWage = price + (price * wage / 100);
-        // 2. Add 7% Profit
-        const withProfit = goldPlusWage * 1.07;
-        // 3. Add 9% Tax (Only on profit + wage, but standard formula often applies to total in simplified market, 
-        // but strictly legally tax is on wage+profit. Let's use the common market formula: (Price + Wage) + 7% + 9% on total is usually wrong.
-        // Correct Legal: Base Gold + (Wage+Profit * 1.09)
-        // Market simplified: (Price * Weight) + ...
+        const goldVal = p * w;
+        const wageVal = goldVal * (wageP/100);
+        const profitVal = (goldVal + wageVal) * (profP/100);
+        // Tax on Wage + Profit (New Law)
+        const taxVal = (wageVal + profitVal) * (taxP/100);
+        const total = goldVal + wageVal + profitVal + taxVal;
         
-        // Let's use the standard formula often used by sellers:
-        // Total per gram = (Price + Wage_amount + 7%_profit_on_base_wage) + 9%_VAT_on_fees
-        // To keep it simple and standard for users:
-        // Total = (Price + Wage%) + 7% Profit + 9% VAT
-        
-        // Let's calculate step by step accurately:
-        const rawPrice = price * weight;
-        const wageAmount = rawPrice * (wage / 100);
-        const profitAmount = (rawPrice + wageAmount) * 0.07;
-        const subTotal = rawPrice + wageAmount + profitAmount;
-        // Tax is 9% on (Wage + Profit) since Jan 2022 in Iran, NOT on the gold itself.
-        const taxAmount = (wageAmount + profitAmount) * 0.09;
-        
-        const finalPrice = rawPrice + wageAmount + profitAmount + taxAmount;
-
-        const det = `
-            قیمت خام طلا: ${formatNum(Math.round(rawPrice))}<br>
-            اجرت ساخت: ${formatNum(Math.round(wageAmount))}<br>
-            سود فروشنده (7%): ${formatNum(Math.round(profitAmount))}<br>
-            مالیات (9% روی سود و اجرت): ${formatNum(Math.round(taxAmount))}
-        `;
-        showResult('gold-result', 'قیمت نهایی برای پرداخت', formatNum(Math.round(finalPrice)) + ' تومان', det);
+        setRes('res-gold', 'قیمت نهایی', fmt(Math.round(total)) + ' تومان', 
+            `قیمت طلا: ${fmt(Math.round(goldVal))}<br>اجرت و سود: ${fmt(Math.round(wageVal+profitVal))}<br>مالیات: ${fmt(Math.round(taxVal))}`);
     }
 
-    // ---- 2. Discount ----
-    function calcDiscount() {
-        const p = parseFloat(document.getElementById('disc-price').value);
-        const d = parseFloat(document.getElementById('disc-percent').value);
-        if(!p || !d) return alert('مقادیر را وارد کنید');
-        
-        const saved = p * (d/100);
-        const final = p - saved;
-        showResult('disc-result', 'قیمت با تخفیف', formatNum(Math.round(final)) + ' تومان', `مبلغ سود شما: ${formatNum(Math.round(saved))} تومان`);
+    function calcLoan() {
+        const P = val('loan-amount'), r = val('loan-rate'), n = val('loan-month');
+        if(!P || !n) return;
+        const i = (r/100)/12;
+        const pmt = (i===0) ? P/n : (P * i * Math.pow(1+i, n)) / (Math.pow(1+i, n) - 1);
+        const total = pmt * n;
+        setRes('res-loan', 'قسط ماهیانه', fmt(Math.round(pmt)) + ' تومان', `کل بازپرداخت: ${fmt(Math.round(total))}<br>کل سود: ${fmt(Math.round(total-P))}`);
     }
 
-    // ---- 3. Password ----
-    function genPass() {
-        const len = parseInt(document.getElementById('pass-len').value);
-        const useSym = document.getElementById('pass-symbol').checked;
-        const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        const syms = "!@#$%^&*()_+";
-        const allChars = useSym ? chars + syms : chars;
-        
-        let pass = "";
-        for(let i=0; i<len; i++) {
-            pass += allChars.charAt(Math.floor(Math.random() * allChars.length));
-        }
-        document.getElementById('pass-text').innerText = pass;
-    }
-    function copyPass() {
-        const txt = document.getElementById('pass-text').innerText;
-        navigator.clipboard.writeText(txt).then(() => alert('کپی شد!'));
+    function calcDeposit() {
+        const P = val('dep-amount'), r = val('dep-rate'), type = $('dep-type').value;
+        let profit = 0;
+        if(type === 'monthly') profit = P * (r/100) / 12; // Monthly payout
+        else profit = P * (r/100); // Yearly
+        setRes('res-dep', 'سود محاسبه شده', fmt(Math.round(profit)) + ' تومان', type==='monthly'?'سود ماهیانه':'سود یکساله');
     }
 
-    // ---- 4. Calories ----
-    function calcCalories() {
-        const gen = document.getElementById('cal-gender').value;
-        const age = parseFloat(document.getElementById('cal-age').value);
-        const h = parseFloat(document.getElementById('cal-height').value);
-        const w = parseFloat(document.getElementById('cal-weight').value);
-        const act = parseFloat(document.getElementById('cal-activity').value);
-
-        if(!age || !h || !w) return alert('اطلاعات را کامل کنید');
-
-        // Mifflin-St Jeor Equation
-        let bmr = (10 * w) + (6.25 * h) - (5 * age);
-        bmr += (gen === 'm') ? 5 : -161;
-
-        const tdee = Math.round(bmr * act);
-        showResult('cal-result', 'کالری روزانه مورد نیاز', tdee + ' کالری', 'برای ثابت ماندن وزن فعلی');
+    function calcDisc() {
+        const p = val('disc-price'), d = val('disc-per');
+        const save = p * (d/100);
+        setRes('res-disc', 'قیمت نهایی', fmt(p - save), `مبلغ تخفیف: ${fmt(save)}`);
     }
 
-    // ---- Previous Functions (Simplified for space) ----
-    function calculateBMI(){
-        const w = parseFloat(document.getElementById('bmi-weight').value), h = parseFloat(document.getElementById('bmi-height').value)/100;
+    // --- Health ---
+    function calcBMI() {
+        const w = val('bmi-w'), h = val('bmi-h')/100;
         if(!w || !h) return;
         const bmi = (w/(h*h)).toFixed(1);
-        let c = bmi<18.5?"#eab308":bmi<25?"#22c55e":bmi<30?"#f97316":"#ef4444";
-        showResult('bmi-result', 'BMI شما', bmi, `<span style="color:${c}">وضعیت شما</span>`);
-    }
-    
-    function calculateAge(){
-        const d=parseInt(document.getElementById('age-day').value), m=parseInt(document.getElementById('age-month').value), y=parseInt(document.getElementById('age-year').value);
-        if(!d||!y) return;
-        const t = jalaali.toJalaali(new Date());
-        let ay = t.jy - y, am = t.jm - m, ad = t.jd - d;
-        if(ad<0){ am--; ad+=30;} if(am<0){ ay--; am+=12;}
-        showResult('age-result', 'سن دقیق', `${ay} سال و ${am} ماه و ${ad} روز`);
-    }
-
-    function convertDate(){
-        const t=document.getElementById('date-type').value, d=parseInt(document.getElementById('d-day').value), m=parseInt(document.getElementById('d-month').value), y=parseInt(document.getElementById('d-year').value);
-        if(!d)return;
-        try{
-            if(t==='s2g'){ const g=jalaali.toGregorian(y,m,d); showResult('date-result', 'میلادی', `${g.gy}-${g.gm}-${g.gd}`); }
-            else{ const j=jalaali.toJalaali(y,m,d); showResult('date-result', 'شمسی', `${j.jy}/${j.jm}/${j.jd}`); }
-        }catch(e){alert('تاریخ اشتباه');}
+        let st = "", diff = 0;
+        const ideal = 22 * h * h;
+        if(bmi<18.5) st="کمبود وزن";
+        else if(bmi<25) st="نرمال";
+        else if(bmi<30) { st="اضافه وزن"; diff = w - (25*h*h); }
+        else { st="چاقی"; diff = w - (25*h*h); }
+        
+        let desc = `وضعیت: ${st}`;
+        if(diff > 0) desc += `<br>تقریباً ${diff.toFixed(1)} کیلوگرم اضافه وزن دارید.`;
+        setRes('res-bmi', 'BMI شما', bmi, desc);
     }
 
-    function calculateLoan(){
-        const p=parseFloat(document.getElementById('loan-amount').value), r=parseFloat(document.getElementById('loan-rate').value), n=parseInt(document.getElementById('loan-months').value);
-        if(!p)return;
-        const i = (r/100)/12; 
-        const m = (r===0)? p/n : (p*i*Math.pow(1+i,n))/(Math.pow(1+i,n)-1);
-        showResult('loan-result', formatNum(Math.round(m))+' تومان', `بازپرداخت کل: ${formatNum(Math.round(m*n))}`);
+    function calcBMR() {
+        const g = $('bmr-g').value, a = val('bmr-a'), w = val('bmr-w'), h = val('bmr-h');
+        let bmr = (10*w) + (6.25*h) - (5*a) + (g==='m'?5:-161);
+        setRes('res-bmr', 'BMR (پایه)', Math.round(bmr) + ' کالری', 'میزان کالری مصرفی بدن در حالت استراحت کامل');
     }
 
-    // Unit Init
-    const uData = {
-        length: {'m':1, 'km':1000, 'cm':0.01, 'mm':0.001, 'in':0.0254, 'ft':0.3048},
-        weight: {'kg':1, 'g':0.001, 'lb':0.453, 'oz':0.028},
-        temp: {} 
-    };
-    const uNames = {length:{'m':'متر','km':'کیلومتر','cm':'سانت','mm':'میل','in':'اینچ','ft':'فوت'}, weight:{'kg':'کیلو','g':'گرم','lb':'پوند','oz':'اونس'}, temp:{'c':'سیلسیوس','f':'فارنهایت'}};
-    
-    function updateUnitOptions(){
-        const c = document.getElementById('unit-category').value, f = document.getElementById('unit-from'), t = document.getElementById('unit-to');
-        f.innerHTML=''; t.innerHTML='';
-        for(let k in uNames[c]){ f.add(new Option(uNames[c][k],k)); t.add(new Option(uNames[c][k],k)); }
-        t.selectedIndex=1;
-    }
-    updateUnitOptions();
-
-    function convertUnit(){
-        const c=document.getElementById('unit-category').value, val=parseFloat(document.getElementById('unit-value').value), f=document.getElementById('unit-from').value, t=document.getElementById('unit-to').value;
-        if(isNaN(val)) return;
-        let res=0;
-        if(c==='temp'){ res = (f==='c' && t==='f') ? (val*9/5)+32 : (f==='f' && t==='c') ? (val-32)*5/9 : val; }
-        else { res = (val * uData[c][f]) / uData[c][t]; }
-        showResult('unit-result', 'نتیجه', res.toFixed(3));
+    function calcTDEE() {
+        const g = $('tdee-g').value, a = val('tdee-a'), w = val('tdee-w'), h = val('tdee-h'), act = val('tdee-act');
+        if(!w) return alert('اطلاعات را وارد کنید');
+        let bmr = (10*w) + (6.25*h) - (5*a) + (g==='m'?5:-161);
+        let tdee = bmr * act;
+        setRes('res-tdee', 'کالری مورد نیاز روزانه', Math.round(tdee), 'برای ثابت نگه داشتن وزن فعلی');
     }
 
-    function calculatePregnancy(){
-        const d=parseInt(document.getElementById('preg-day').value), m=parseInt(document.getElementById('preg-month').value), y=parseInt(document.getElementById('preg-year').value);
-        if(!d)return;
-        const g = jalaali.toGregorian(y,m,d);
-        const lmp = new Date(g.gy, g.gm-1, g.gd);
+    function calcIBW() {
+        const h = val('ibw-h'), g = $('ibw-g').value;
+        // Devine Formula
+        let base = g==='m'?50:45.5;
+        let ibw = base + 2.3 * ((h/2.54) - 60);
+        setRes('res-ibw', 'وزن ایده‌آل', Math.round(ibw) + ' کیلوگرم', 'بر اساس فرمول Devine');
+    }
+
+    function calcWHR() {
+        const w = val('whr-w'), h = val('whr-h'), g = $('whr-g').value;
+        const r = (w/h).toFixed(2);
+        let risk = "کم";
+        if(g==='m' && r>0.9) risk="بالا";
+        if(g==='f' && r>0.85) risk="بالا";
+        setRes('res-whr', 'نسبت WHR', r, `ریسک سلامتی مرتبط با چاقی شکمی: ${risk}`);
+    }
+
+    function calcPreg() {
+        const d = val('preg-d'), m = val('preg-m'), y = val('preg-y');
+        if(!d) return;
+        const gLMP = jalaali.toGregorian(y, m, d);
+        const lmp = new Date(gLMP.gy, gLMP.gm-1, gLMP.gd);
+        const now = new Date();
+        const diffT = now - lmp;
+        const days = Math.floor(diffT/(1000*60*60*24));
+        const weeks = Math.floor(days/7);
+        const remDays = days % 7;
+        
         const due = new Date(lmp); due.setDate(lmp.getDate()+280);
         const jDue = jalaali.toJalaali(due);
-        const weeks = Math.floor(Math.abs(new Date()-lmp)/(1000*60*60*24*7));
-        showResult('baby-result', 'سن جنین: '+weeks+' هفته', `تاریخ زایمان: ${jDue.jy}/${jDue.jm}/${jDue.jd}`);
+        
+        setRes('res-preg', 'سن جنین', `${weeks} هفته و ${remDays} روز`, `تاریخ تقریبی زایمان: ${jDue.jy}/${jDue.jm}/${jDue.jd}`);
     }
+
+    // --- Time ---
+    let ageInterval;
+    function calcAge() {
+        const d=val('age-d'), m=val('age-m'), y=val('age-y');
+        if(!d) return;
+        
+        if(ageInterval) clearInterval(ageInterval);
+        
+        const gB = jalaali.toGregorian(y,m,d);
+        const birth = new Date(gB.gy, gB.gm-1, gB.gd);
+        
+        const update = () => {
+            const now = new Date();
+            let diff = now - birth;
+            let sec = Math.floor(diff/1000);
+            let min = Math.floor(sec/60);
+            let hr = Math.floor(min/60);
+            let day = Math.floor(hr/24);
+            let yr = Math.floor(day/365.25);
+            
+            // Next Birthday
+            const nextB = new Date(birth);
+            nextB.setFullYear(now.getFullYear());
+            if(now > nextB) nextB.setFullYear(now.getFullYear()+1);
+            const daysLeft = Math.ceil((nextB - now)/(1000*60*60*24));
+            
+            setRes('res-age', 'سن دقیق شما', `${yr} سال`, 
+                `${day} روز زنده بوده‌اید<br>یا ${fmt(hr)} ساعت<br>یا ${fmt(sec)} ثانیه<br><br><b>${daysLeft} روز</b> مانده تا تولد بعدی`);
+        };
+        update();
+        ageInterval = setInterval(update, 1000);
+    }
+
+    function calcDateConv() {
+        const t = $('conv-type').value, d=val('conv-d'), m=val('conv-m'), y=val('conv-y');
+        if(t==='s2g'){
+            const g = jalaali.toGregorian(y,m,d);
+            setRes('res-conv', 'میلادی', `${g.gy}-${g.gm}-${g.gd}`, '');
+        } else if(t==='g2s'){
+            const j = jalaali.toJalaali(y,m,d);
+            setRes('res-conv', 'شمسی', `${j.jy}/${j.jm}/${j.jd}`, '');
+        } else {
+             // Approximate Hijri
+             const g = jalaali.toGregorian(y,m,d);
+             const dt = new Date(g.gy, g.gm-1, g.gd);
+             const h = new Intl.DateTimeFormat('en-u-ca-islamic', {day:'numeric', month:'numeric', year:'numeric'}).format(dt);
+             setRes('res-conv', 'قمری (تقریبی)', h, '');
+        }
+    }
+
+    function calcDateDiff() {
+        const y1=val('d1-y'), m1=val('d1-m'), d1=val('d1-d');
+        const y2=val('d2-y'), m2=val('d2-m'), d2=val('d2-d');
+        const g1 = jalaali.toGregorian(y1,m1,d1);
+        const g2 = jalaali.toGregorian(y2,m2,d2);
+        const date1 = new Date(g1.gy, g1.gm-1, g1.gd);
+        const date2 = new Date(g2.gy, g2.gm-1, g2.gd);
+        const diff = Math.abs(date2 - date1);
+        const days = Math.ceil(diff/(1000*60*60*24));
+        setRes('res-diff', 'اختلاف', `${days} روز`, `${(days/365.25).toFixed(1)} سال`);
+    }
+    
+    function calcDateMath(){
+        const d=val('dc-d'),m=val('dc-m'),y=val('dc-y'), op=$('dc-op').value, v=val('dc-val');
+        const g = jalaali.toGregorian(y,m,d);
+        const dt = new Date(g.gy, g.gm-1, g.gd);
+        dt.setDate(dt.getDate() + (op==='add'?v:-v));
+        const j = jalaali.toJalaali(dt);
+        setRes('res-dc', 'تاریخ جدید', `${j.jy}/${j.jm}/${j.jd}`, '');
+    }
+    
+    function calcDayFind(){
+        const d=val('df-d'),m=val('df-m'),y=val('df-y');
+        const g = jalaali.toGregorian(y,m,d);
+        const dt = new Date(g.gy, g.gm-1, g.gd);
+        const day = dt.toLocaleDateString('fa-IR', {weekday:'long'});
+        setRes('res-df', 'روز هفته', day, '');
+    }
+    
+    function updateClocks(){
+        const zones = {'ایران': 'Asia/Tehran', 'نیویورک': 'America/New_York', 'لندن': 'Europe/London', 'توکیو': 'Asia/Tokyo', 'دبی': 'Asia/Dubai', 'سیدنی': 'Australia/Sydney'};
+        let h = "";
+        for(let z in zones){
+            const time = new Date().toLocaleTimeString('fa-IR', {timeZone: zones[z], hour:'2-digit', minute:'2-digit'});
+            h += `<div><div style="font-size:0.8rem;color:#666">${z}</div><div style="font-weight:bold;font-size:1.1rem">${time}</div></div>`;
+        }
+        $('clocks-container').innerHTML = h;
+    }
+    setInterval(updateClocks, 60000); updateClocks();
+
+    // --- Units ---
+    const units = {
+        mass: {
+            factors: {'kg':1, 'g':0.001, 'mg':0.000001, 'ton':1000, 'lb':0.453592, 'oz':0.0283495, 'mesghal':0.004608, 'nokhod':0.000192},
+            names: {'kg':'کیلوگرم', 'g':'گرم', 'mg':'میلی‌گرم', 'ton':'تن', 'lb':'پوند', 'oz':'اونس', 'mesghal':'مثقال طلا', 'nokhod':'نخود طلا'}
+        },
+        len: {
+            factors: {'m':1, 'cm':0.01, 'mm':0.001, 'km':1000, 'in':0.0254, 'ft':0.3048, 'yd':0.9144, 'mile':1609.34},
+            names: {'m':'متر', 'cm':'سانتی‌متر', 'mm':'میلی‌متر', 'km':'کیلومتر', 'in':'اینچ', 'ft':'فوت', 'yd':'یارد', 'mile':'مایل'}
+        },
+        area: {
+            factors: {'m2':1, 'cm2':0.0001, 'hec':10000, 'jerib':1000, 'ft2':0.0929},
+            names: {'m2':'متر مربع', 'cm2':'سانت مربع', 'hec':'هکتار', 'jerib':'جریب', 'ft2':'فوت مربع'}
+        },
+        temp: { names: {'c':'سلسیوس', 'f':'فارنهایت', 'k':'کلوین'} } // Special logic
+    };
+    
+    // Init Units
+    ['mass', 'len', 'area', 'temp'].forEach(cat => {
+        const selF = $(`u-${cat.charAt(0)}-from`), selT = $(`u-${cat.charAt(0)}-to`);
+        if(selF){
+            for(let k in units[cat].names) {
+                selF.add(new Option(units[cat].names[k], k));
+                selT.add(new Option(units[cat].names[k], k));
+            }
+            selT.selectedIndex = 1;
+        }
+    });
+
+    function calcUnit(cat) {
+        const c = cat.charAt(0);
+        const v = val(`u-${c}-val`), f = $(`u-${c}-from`).value, t = $(`u-${c}-to`).value;
+        let res = 0;
+        if(cat === 'temp'){
+            if(f==='c' && t==='f') res = (v*9/5)+32;
+            else if(f==='c' && t==='k') res = v+273.15;
+            else if(f==='f' && t==='c') res = (v-32)*5/9;
+            else if(f==='k' && t==='c') res = v-273.15;
+            else res = v; // Simplified
+        } else {
+            const base = v * units[cat].factors[f];
+            res = base / units[cat].factors[t];
+        }
+        setRes(`res-u-${cat}`, 'نتیجه', Number(res.toPrecision(6)), '');
+    }
+
+    // --- GPA ---
+    function addGpaRow(){
+        const div = document.createElement('div');
+        div.className = 'gpa-row';
+        div.innerHTML = `<input type="number" placeholder="نمره" class="g-score"><input type="number" placeholder="واحد" class="g-credit" style="width:70px">`;
+        $('gpa-rows').appendChild(div);
+    }
+    addGpaRow(); addGpaRow(); addGpaRow();
+
+    function calcGPA(){
+        const scores = document.querySelectorAll('.g-score');
+        const credits = document.querySelectorAll('.g-credit');
+        let sumS = 0, sumC = 0;
+        scores.forEach((s, i) => {
+            const sc = parseFloat(s.value), cr = parseFloat(credits[i].value);
+            if(!isNaN(sc) && !isNaN(cr)){
+                sumS += sc * cr;
+                sumC += cr;
+            }
+        });
+        if(sumC === 0) return;
+        setRes('res-gpa', 'معدل شما', (sumS/sumC).toFixed(2), `مجموع واحدها: ${sumC}`);
+    }
+
 </script>
 </body>
 </html>
